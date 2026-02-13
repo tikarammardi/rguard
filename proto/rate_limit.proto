@@ -1,13 +1,14 @@
 syntax = "proto3";
+option go_package = "github.com/tikarammardi/rate-limiter-engine/proto;proto";
 
 package ratelimiter;
 
 service RateLimiter {
   //TODO: Check if user is allowed to perform an action
-  rcp Check(LimitRequest) returns (LimitResponse);
+  rpc Check(LimitRequest) returns (LimitResponse);
 
   // TODO Stream analytics data to the Analyst Service
- rcp StreamAnalytics(stream AnalyticsEvent) returns (AnalyticsSummary);
+ rpc StreamAnalytics(stream AnalyticsEvent) returns (AnalyticsSummary);
 }
 
 message LimitRequest {
