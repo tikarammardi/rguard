@@ -4,8 +4,11 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"rate-limiter-engine/internal/limiter"
 	"rate-limiter-engine/proto"
+	"syscall"
 
 	"google.golang.org/grpc"
 )
@@ -25,17 +28,28 @@ func (s *server) Check(ctx context.Context, req *proto.LimitRequest) (*proto.Lim
 }
 
 func main() {
+	g := limiter.NewGuard(100)
+
+	grpcServer := grpc.NewServer()
+	proto.RegisterRateLimiterServer(grpcServer, &server{
+		guard: g,
+	})
+
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
-	proto.RegisterRateLimiterServer(s, &server{
-		guard: limiter.NewGuard(100),
-	})
+	go func() {
+		log.Printf("server listening at %v", lis.Addr())
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("Server stopped serving: %v", err)
+		}
+	}()
 
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	<-stop
+	log.Println("Shutting down gracefully...")
+	grpcServer.GracefulStop()
 }
