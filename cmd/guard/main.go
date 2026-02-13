@@ -7,10 +7,11 @@ import (
 	"os"
 	"os/signal"
 	"rate-limiter-engine/internal/limiter"
-	"rate-limiter-engine/proto"
+
 	"syscall"
 
 	"google.golang.org/grpc"
+	"rate-limiter-engine/github.com/tikarammardi/rate-limiter-engine/proto"
 )
 
 type server struct {
