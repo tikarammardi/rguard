@@ -13,6 +13,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"rate-limiter-engine/github.com/tikarammardi/rate-limiter-engine/proto"
 )
 
@@ -64,6 +65,9 @@ func main() {
 	)
 
 	proto.RegisterRateLimiterServer(s, &server{})
+
+	// Register reflection api
+	reflection.Register(s)
 
 	// 5. RUN & GRACEFUL SHUTDOWN
 	go func() {
