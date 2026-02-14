@@ -8,5 +8,5 @@ type Result struct {
 	Reset     int64
 }
 type LimiterStore interface {
-	Take(ctx context.Context, key string, amount int) (Result, error)
+	Take(ctx context.Context, key string, amount int, rate float64, cap float64) (Result, error)
 }

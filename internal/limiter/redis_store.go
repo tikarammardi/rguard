@@ -42,15 +42,15 @@ type RedisStore struct {
 	cap  float64
 }
 
-func NewRedisStore(rdb *redis.Client, rate float64, cap float64) *RedisStore {
-	return &RedisStore{rdb: rdb, rate: rate, cap: cap}
+func NewRedisStore(rdb *redis.Client) *RedisStore {
+	return &RedisStore{rdb: rdb}
 }
 
-func (r *RedisStore) Take(ctx context.Context, key string, amount int) (Result, error) {
+func (r *RedisStore) Take(ctx context.Context, key string, amount int, rate float64, cap float64) (Result, error) {
 	now := time.Now().Unix()
 
 	// Lua returns an array: [allowed, remaining, reset_timestamp]
-	res, err := r.rdb.Eval(ctx, luaTokenBucket, []string{key}, now, r.rate, r.cap).Result()
+	res, err := r.rdb.Eval(ctx, luaTokenBucket, []string{key}, now, rate, cap).Result()
 	if err != nil {
 		return Result{Allowed: true}, err // Fail-open
 	}

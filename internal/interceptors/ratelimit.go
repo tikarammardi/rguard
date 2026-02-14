@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func UnaryRateLimitInterceptor(g *limiter.Guard) grpc.UnaryServerInterceptor {
+func UnaryRateLimitInterceptor(g *limiter.Guard, configStore *limiter.ConfigStore) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		req interface{},
@@ -28,8 +28,10 @@ func UnaryRateLimitInterceptor(g *limiter.Guard) grpc.UnaryServerInterceptor {
 			}
 		}
 
+		userCfg := configStore.GetUserConfig(ctx, userID)
+
 		// 2. Perform the Rate Limit Check
-		res := g.Check(ctx, userID)
+		res := g.Check(ctx, userID, userCfg.Rate, userCfg.Capacity)
 
 		// 3. Attach standard headers to the response
 		header := metadata.Pairs(

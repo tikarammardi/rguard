@@ -46,12 +46,14 @@ func main() {
 		capacity   = 50.0
 	)
 
+	configStore := limiter.NewConfigStore(rdb)
+
 	// Using JSON handler for structured logging (Production Standard)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	// 3. DEPENDENCY INJECTION
-	store := limiter.NewRedisStore(rdb, refillRate, capacity)
-	g := limiter.NewGuard(store, logger)
+	store := limiter.NewRedisStore(rdb)
+	guard := limiter.NewGuard(store, logger)
 
 	// 4. gRPC SERVER SETUP with INTERCEPTOR
 	lis, err := net.Listen("tcp", port)
@@ -61,7 +63,7 @@ func main() {
 
 	// Register the RateLimit Interceptor here! 🛡️
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(interceptors.UnaryRateLimitInterceptor(g)),
+		grpc.UnaryInterceptor(interceptors.UnaryRateLimitInterceptor(guard, configStore)),
 	)
 
 	proto.RegisterRateLimiterServer(s, &server{})
