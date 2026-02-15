@@ -1,12 +1,22 @@
 FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
+# Install protoc and build tools
+RUN apk add --no-cache protobuf protobuf-dev make
+
 # Cache dependencies by copying only go.mod and go.sum first
 COPY go.mod go.sum ./
 RUN go mod download
 
+# Install protobuf Go plugins
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
 # Copy the rest of the source
 COPY . .
+
+# Generate protobuf files
+RUN make generate
 
 # Build a static, stripped binary
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /guard ./cmd/guard/main.go
