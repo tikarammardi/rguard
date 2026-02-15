@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/tikarammardi/rate-limiter-guard/proto;proto";
+option go_package = "./proto";
 
 package ratelimiter;
 

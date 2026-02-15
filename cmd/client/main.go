@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"rate-limiter-engine/github.com/tikarammardi/rate-limiter-engine/proto"
+	"rate-limiter-engine/proto"
 )
 
 func main() {

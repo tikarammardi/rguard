@@ -14,7 +14,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"rate-limiter-engine/github.com/tikarammardi/rate-limiter-engine/proto"
+	"rate-limiter-engine/proto"
 )
 
 type server struct {
