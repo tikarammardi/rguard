@@ -254,6 +254,8 @@ client.CheckLimit({ user_id: "user-123" }, (err, response) => {
 ### cURL (via grpcurl)
 
 ```bash
+grpcurl -plaintext localhost:50051 list
+
 grpcurl -plaintext \
   -d '{"user_id": "user-123"}' \
   localhost:50051 ratelimiter.RateLimiter/CheckLimit
